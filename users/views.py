@@ -100,3 +100,21 @@ class CustomerLoginView(APIView):
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class SellerListAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        product = Seller.objects.all()
+        serializer = SellerSerializer(product, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CustomerListAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        product = Customer.objects.all()
+        serializer = CustomerSerializer(product, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
