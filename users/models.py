@@ -36,3 +36,7 @@ class Customer(MyUser):
     phone_number = models.CharField(max_length=255, null=False, blank=False)
     card_number = models.CharField(max_length=255, null=True, blank=True)
     post_code = models.CharField(max_length=255, null=True, blank=True)
+
+
+
+

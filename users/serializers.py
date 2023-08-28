@@ -86,3 +86,19 @@ class CustomerSerializer(serializers.ModelSerializer):
                 {'password': 'Password fields didnt match!'}
             )
         return attrs
+
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    customer = Customer
+
+    class Meta:
+        model = Customer
+        exclude = ['password', 'is_active', 'is_staff', 'is_admin', 'is_superuser', 'groups', 'user_permissions']
+
+
+class SellerProfileSerializer(serializers.ModelSerializer):
+    seller = Seller
+
+    class Meta:
+        model = Seller
+        exclude = ['password', 'is_active', 'is_staff', 'is_admin', 'is_superuser', 'groups', 'user_permissions']
