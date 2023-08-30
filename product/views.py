@@ -4,8 +4,8 @@ from rest_framework import permissions, status
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import ProductSerializer, BasketItemSerializer
-from .models import Product, BasketItem, Basket
+from .serializer import ProductSerializer, BasketItemSerializer, CommentSerializer
+from .models import Product, BasketItem, Basket, Comment, Rate
 from users.permisions import IsSellerPermission, IsOwnerOrReadOnly, IsOwnerOfBasket
 
 
@@ -110,6 +110,38 @@ class BasketDetailAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Basket.DoesNotExist:
             return Response("Basket does not exist.", status=status.HTTP_404_NOT_FOUND)
+
+
+class CommentCreateAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, id):
+        try:
+            product = Product.objects.get(id=id)
+        except Product.DoesNotExist:
+            return Response("Product does not exist.", status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            comment = serializer.save(product=product)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class CommentListAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, product_id):
+        try:
+            product = Product.objects.get(id=product_id)
+            comments = product.comments.all()
+            serializer = CommentSerializer(comments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Product.DoesNotExist:
+            return Response("Product does not exist.", status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 

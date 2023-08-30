@@ -1,20 +1,11 @@
-import jwt
-from django.http import Http404
-from django.shortcuts import render
-from django.contrib.auth import login
-from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.parsers import JSONParser
-from rest_framework_simplejwt import exceptions
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import permissions, status
 from .serializers import SellerSerializer, CustomerSerializer, MyTokenObtainPairSerializer, CustomerProfileSerializer, SellerProfileSerializer
 from product.serializer import ProductSerializer
 from .models import Seller, Customer
-from .permisions import AnnonPermission, IsSellerPermission, IsOwnerOrReadOnly
+from .permisions import AnnonPermission
 from product.models import Product, Basket
 
 class LoginView(TokenObtainPairView):
@@ -95,14 +86,12 @@ class SellerProfileAPIView(APIView):
 
     def get(self, request, id):
         try:
-            seller = Seller.objects.get(id=id)  # Получаем профиль продавца
+            seller = Seller.objects.get(id=id)
+            products = Product.objects.filter(seller=seller)
 
-            products = Product.objects.filter(seller=seller)  # Получаем все товары, созданные продавцом
+            seller_serializer = SellerProfileSerializer(seller)
+            products_serializer = ProductSerializer(products, many=True)
 
-            seller_serializer = SellerProfileSerializer(seller)  # Сериализатор для профиля продавца
-            products_serializer = ProductSerializer(products, many=True)  # Сериализатор для товаров
-
-            # Создаем словарь для объединения данных
             seller_data = {
                 "seller_profile": seller_serializer.data,
                 "products": products_serializer.data
